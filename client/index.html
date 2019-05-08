@@ -14,7 +14,6 @@
     </div>
     <div class="message">
         <ul class="list-group" id="message-body">
-            <li class="list-group-item list-group-item-secondary text-center">开始聊天吧</li>
         </ul>
     </div>
 </div>
@@ -28,18 +27,22 @@
     function initChat() {
         ws = new WebSocket("ws://test.xieyanjun.com:9501");
         ws.onopen = function (event) {
-            layer.alert("websocket链接成功，开始聊天吧")
+            appendMessage("websocket链接成功，开始聊天吧")
         };
         ws.onmessage = function (event) {
-            var msg = "<li class=\"list-group-item list-group-item-secondary text-center\">" + event.data +"</li>";
-            $("#message-body").append(msg)
+            appendMessage(event.data)
         };
         ws.onclose = function (event) {
-            layer.msg("系统已断开链接" + this.readyState);
+            appendMessage("系统已断开链接" + this.readyState);
         };
         ws.onerror = function (event) {
-            layer.alert("websocket异常")
+            appendMessage("websocket异常")
         }
+    }
+
+    function appendMessage(message) {
+        var msg = "<li class=\"list-group-item list-group-item-secondary text-center\">" + message +"</li>";
+        $("#message-body").append(msg)
     }
 
     $("#send").click(function () {
