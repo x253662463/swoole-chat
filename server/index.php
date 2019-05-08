@@ -2,6 +2,12 @@
 
 $server = new Swoole\WebSocket\Server("0.0.0.0", 9501);
 
+$server->set([
+    'log_level' => 5,
+    'log_file' => '/var/log/swoole.log',
+    'daemonize' => true
+]);
+
 $server->on('open', function (Swoole\WebSocket\Server $server, $request) {
     echo "server: handshake success with fd{$request->fd}\n";
 });
