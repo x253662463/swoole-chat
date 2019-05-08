@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/layer/2.3/skin/layer.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <div class="w-80">
+        <textarea id="message" placeholder="输入消息" class="form-control"></textarea>
+        <button id="send" class="btn btn-primary btn-sm">发送</button>
+    </div>
+    <div class="message">
+        <ul class="list-group" id="message-body">
+            <li class="list-group-item list-group-item-secondary text-center">开始聊天吧</li>
+        </ul>
+    </div>
+</div>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/layer/2.3/layer.js"></script>
+<script>
+    var ws;
+    initChat();
+
+    function initChat() {
+        ws = new WebSocket("ws://test.xieyanjun.com:9501");
+        ws.onopen = function (event) {
+            layer.alert(event)
+        };
+        ws.onmessage = function (event) {
+            var msg = "<li class=\"list-group-item list-group-item-secondary text-center\">" + event.data +"</li>";
+            $("#message-body").append(msg)
+        };
+        ws.onclose = function (event) {
+            layer.msg("系统已断开链接" + this.readyState);
+        };
+        ws.onerror = function (event) {
+            layer.alert("websocket异常")
+        }
+    }
+
+    $("#send").click(function () {
+        var newMsg = $("#message").val();
+        sendMessage(newMsg)
+    });
+
+    function sendMessage(message) {
+        ws.send(message);
+    }
+</script>
+</body>
+</html>
