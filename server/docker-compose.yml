@@ -1,0 +1,11 @@
+version: '3'
+services:
+  web:
+    image: twosee/swoole-coroutine
+    container_name: swoole
+    command: php /workdir/index.php
+    ports:
+      - 9501:9501
+    volumes:
+      - ./:/workdir/
+      - ./log:/var/log/
