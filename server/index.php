@@ -3,33 +3,30 @@
 $server = new Swoole\WebSocket\Server("0.0.0.0", 9501);
 
 $server->set([
-    'log_level' => 5,
+    'log_level' => 0,
     'log_file' => '/var/log/swoole.log',
 //    'daemonize' => true
 ]);
 
 $server->on('open', function (Swoole\WebSocket\Server $server, $request) {
-    echo "server: handshake success with fd{$request->fd}\n";
+    $date = date("Y-m-d G:i:s");
+    echo "[{$date}] {$request->fd} 已连接 \n";
 });
 $server->on('message', function (Swoole\WebSocket\Server $server, $frame) {
-    echo "receive from {$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}\n";
+    $date = date("Y-m-d G:i:s");
+    echo "[{$date}] 接收来自{$frame->fd}的消息，消息内容：{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish} \n";
     foreach ($server->connections as $fd) {
+        if ($fd == $frame->fd) {
+            continue;
+        }
         if ($server->isEstablished($fd)) {
+            echo "[{$date}] 发送消息给{$fd},消息内容：{$frame->data}";
             $server->push($fd, $frame->data);
         }
     }
 });
 $server->on('close', function ($ser, $fd) {
-    echo "client {$fd} closed\n";
-});
-$server->on('request', function (Swoole\Http\Request $request, Swoole\Http\Response $response) {
-    global $server;//调用外部的server
-    // $server->connections 遍历所有websocket连接用户的fd，给所有用户推送
-    foreach ($server->connections as $fd) {
-        // 需要先判断是否是正确的websocket连接，否则有可能会push失败
-        if ($server->isEstablished($fd)) {
-            $server->push($fd, $request->get['message']);
-        }
-    }
+    $date = date("Y-m-d G:i:s");
+    echo "[$date] {$fd} 断开连接 \n";
 });
 $server->start();
